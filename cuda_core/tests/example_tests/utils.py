@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) 2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2024-2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 import gc
@@ -25,9 +25,6 @@ def run_example(parent_dir: str, rel_path_to_example: str, env=None) -> None:
         sys.argv = [str(fullpath)]
 
         # Collect metadata for file 'module_name' located at 'fullpath'.
-        # CASE: file does not exist -> spec is none.
-        # CASE: file is not .py -> spec is none.
-        # CASE: file does not have proper loader (module.spec.__loader__) -> spec.loader is none.
         spec = importlib.util.spec_from_file_location(module_name, fullpath)
 
         if spec is None or spec.loader is None:
@@ -38,10 +35,9 @@ def run_example(parent_dir: str, rel_path_to_example: str, env=None) -> None:
         sys.modules[module_name] = module
 
         # This runs top-level code.
-        # CASE: exec() -> top-level code is implicitly run.
         spec.loader.exec_module(module)
 
-        # CASE: main() -> we find main and call it below.
+        # If the module has a main() function, call it.
         if hasattr(module, "main"):
             module.main()
 

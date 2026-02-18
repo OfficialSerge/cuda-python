@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) 2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2024-2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 # If we have subcategories of examples in the future, this file can be split along those lines
@@ -21,4 +21,8 @@ SAMPLE_FILES = sorted([str(p.relative_to(EXAMPLES_DIR)) for p in EXAMPLES_DIR.gl
 class TestExamples:
     # deinit_cuda is defined in conftest.py and pops the cuda context automatically.
     def test_example(self, example_rel_path: str, deinit_cuda) -> None:
+        from cuda.core import Device
+
+        # redundantly set current device to 0 in case previous example was multi-GPU
+        Device(0).set_current()
         run_example(str(EXAMPLES_DIR), example_rel_path)
